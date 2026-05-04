@@ -41,6 +41,27 @@ controls.enableDamping = true;
 // Popup System
 const popup = createPopup();
 
+// Simulation State
+let speedMultiplier = 1;
+
+// Activity Log Function
+const addLog = (message) => {
+  const container = document.getElementById('log-container');
+  if (!container) return;
+  
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  const time = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+  
+  container.prepend(entry);
+  
+  // Keep only last 20 entries
+  if (container.children.length > 20) {
+    container.removeChild(container.lastChild);
+  }
+};
+
 // Raycaster setup for interactivity
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -189,7 +210,7 @@ class DataBit {
   }
 
   update() {
-    this.progress += this.speed;
+    this.progress += this.speed * speedMultiplier;
     if (this.progress > 1) {
       this.progress = 0;
       this.mesh.position.copy(this.start);
@@ -212,6 +233,28 @@ const spawnDataBurst = (start, end, color, count = 10) => {
 // Initial particles for visual flow
 spawnDataBurst(new THREE.Vector3(2, -0.2, 0), cpu.position, 0x00ffcc, 5);
 spawnDataBurst(cpu.position, gpu.position, 0x3366ff, 5);
+
+// Speed slider listener
+document.getElementById('speed-slider').addEventListener('input', (e) => {
+  speedMultiplier = parseFloat(e.target.value);
+  addLog(`Simulation speed set to ${speedMultiplier}x`);
+});
+
+// Example periodic logs
+setInterval(() => {
+  const events = [
+    "Instruction fetched from RAM...",
+    "CPU cycle complete.",
+    "Data write to SSD initialized.",
+    "L3 Cache hit.",
+    "Bus arbitration successful."
+  ];
+  if (Math.random() > 0.7) {
+    addLog(events[Math.floor(Math.random() * events.length)]);
+  }
+}, 3000);
+
+addLog("System initialized. Welcome to Computer Arch 3D.");
 
 // Handle window resize
 window.addEventListener('resize', () => {

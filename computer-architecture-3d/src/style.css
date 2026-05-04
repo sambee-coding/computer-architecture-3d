@@ -143,3 +143,65 @@ canvas {
   color: #fff;
   text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
 }
+
+.control {
+  margin-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+
+#speed-slider {
+  width: 80px;
+  cursor: pointer;
+}
+
+/* Activity Log Styles */
+#activity-log {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 150px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Courier New', Courier, monospace;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.log-header {
+  padding: 8px 12px;
+  font-size: 10px;
+  color: #00ffcc;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: bold;
+}
+
+#log-container {
+  flex-grow: 1;
+  overflow-y: hidden;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #aaa;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.log-entry {
+  margin-bottom: 4px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.log-time {
+  color: #555;
+  margin-right: 8px;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
