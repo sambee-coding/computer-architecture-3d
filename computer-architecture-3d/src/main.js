@@ -229,6 +229,21 @@ window.addEventListener('resize', () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+// Cursor hover feedback
+window.addEventListener('mousemove', (event) => {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+
+  if (intersects.length > 0) {
+    document.body.style.cursor = 'pointer';
+  } else {
+    document.body.style.cursor = 'default';
+  }
+});
+
 // Click handler
 window.addEventListener('click', (event) => {
   // Calculate mouse position in normalized device coordinates (-1 to +1)
@@ -285,6 +300,17 @@ const animate = () => {
 
   // Update particles
   particles.forEach(p => p.update());
+
+  // Update Dashboard stats with subtle variation
+  if (Math.random() > 0.95) {
+    const cpuTemp = document.getElementById('cpu-temp');
+    const ramUtil = document.getElementById('ram-util');
+    const busSpeed = document.getElementById('bus-speed');
+    
+    if (cpuTemp) cpuTemp.textContent = (40 + Math.sin(time) * 5).toFixed(1);
+    if (ramUtil) ramUtil.textContent = (14 + Math.cos(time * 0.5) * 0.5).toFixed(1);
+    if (busSpeed) busSpeed.textContent = Math.floor(5000 + Math.random() * 50);
+  }
 
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
