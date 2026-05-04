@@ -173,6 +173,46 @@ scene.add(busCpuRam);
 const busCpuGpu = createBus(cpu.position, gpu.position, 0x3366ff);
 scene.add(busCpuGpu);
 
+// Data Particles System
+const particles = [];
+class DataBit {
+  constructor(start, end, color) {
+    const geom = new THREE.SphereGeometry(0.05, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({ color: color });
+    this.mesh = new THREE.Mesh(geom, mat);
+    this.start = start.clone();
+    this.end = end.clone();
+    this.progress = 0;
+    this.speed = 0.01 + Math.random() * 0.02;
+    this.mesh.position.copy(this.start);
+    scene.add(this.mesh);
+  }
+
+  update() {
+    this.progress += this.speed;
+    if (this.progress > 1) {
+      this.progress = 0;
+      this.mesh.position.copy(this.start);
+    } else {
+      // Linear interpolation between start and end
+      this.mesh.position.lerpVectors(this.start, this.end, this.progress);
+    }
+  }
+}
+
+// Function to spawn a burst of data
+const spawnDataBurst = (start, end, color, count = 10) => {
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      particles.push(new DataBit(start, end, color));
+    }, i * 100);
+  }
+};
+
+// Initial particles for visual flow
+spawnDataBurst(new THREE.Vector3(2, -0.2, 0), cpu.position, 0x00ffcc, 5);
+spawnDataBurst(cpu.position, gpu.position, 0x3366ff, 5);
+
 // Handle window resize
 window.addEventListener('resize', () => {
   // Update sizes
@@ -242,6 +282,9 @@ const animate = () => {
   // Bus animation
   busCpuRam.material.emissiveIntensity = 0.5 + Math.sin(time * 10) * 0.5;
   busCpuGpu.material.emissiveIntensity = 0.5 + Math.cos(time * 8) * 0.5;
+
+  // Update particles
+  particles.forEach(p => p.update());
 
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
