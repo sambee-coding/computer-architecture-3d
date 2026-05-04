@@ -24,7 +24,25 @@ export function createPopup() {
       if (info) {
         document.getElementById('popup-title').textContent = info.title;
         document.getElementById('popup-description').textContent = info.description;
+        
+        // Handle Specs
+        const existingSpecs = popup.querySelector('.specs-list');
+        if (existingSpecs) existingSpecs.remove();
+        
+        if (info.specs) {
+          const specsList = document.createElement('ul');
+          specsList.className = 'specs-list';
+          info.specs.forEach(spec => {
+            const li = document.createElement('li');
+            li.textContent = spec;
+            specsList.appendChild(li);
+          });
+          popup.querySelector('.popup-content').appendChild(specsList);
+        }
+        
         popup.style.display = 'flex';
+        // Play sound if function exists
+        if (window.playClickSound) window.playClickSound();
       }
     },
     hide: () => {

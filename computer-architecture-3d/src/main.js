@@ -41,6 +41,44 @@ controls.enableDamping = true;
 // Popup System
 const popup = createPopup();
 
+// Simulation State
+let speedMultiplier = 1;
+
+// Web Audio API Synth for UI Sounds
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+window.playClickSound = () => {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+  gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.1);
+};
+
+// Activity Log Function
+const addLog = (message) => {
+  const container = document.getElementById('log-container');
+  if (!container) return;
+  
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  const time = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+  
+  container.prepend(entry);
+  
+  // Keep only last 20 entries
+  if (container.children.length > 20) {
+    container.removeChild(container.lastChild);
+  }
+};
+
 // Raycaster setup for interactivity
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -173,6 +211,90 @@ scene.add(busCpuRam);
 const busCpuGpu = createBus(cpu.position, gpu.position, 0x3366ff);
 scene.add(busCpuGpu);
 
+// Data Particles System
+const particles = [];
+class DataBit {
+  constructor(start, end, color) {
+    const geom = new THREE.SphereGeometry(0.05, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({ color: color });
+    this.mesh = new THREE.Mesh(geom, mat);
+    this.start = start.clone();
+    this.end = end.clone();
+    this.progress = 0;
+    this.speed = 0.01 + Math.random() * 0.02;
+    this.mesh.position.copy(this.start);
+    scene.add(this.mesh);
+  }
+
+  update() {
+    this.progress += this.speed * speedMultiplier;
+    if (this.progress > 1) {
+      this.progress = 0;
+      this.mesh.position.copy(this.start);
+    } else {
+      // Linear interpolation between start and end
+      this.mesh.position.lerpVectors(this.start, this.end, this.progress);
+    }
+  }
+}
+
+// Function to spawn a burst of data
+const spawnDataBurst = (start, end, color, count = 10) => {
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      particles.push(new DataBit(start, end, color));
+    }, i * 100);
+  }
+};
+
+// Initial particles for visual flow
+spawnDataBurst(new THREE.Vector3(2, -0.2, 0), cpu.position, 0x00ffcc, 5);
+spawnDataBurst(cpu.position, gpu.position, 0x3366ff, 5);
+
+// Speed slider listener
+document.getElementById('speed-slider').addEventListener('input', (e) => {
+  speedMultiplier = parseFloat(e.target.value);
+  addLog(`Simulation speed set to ${speedMultiplier}x`);
+});
+
+// Example periodic logs
+setInterval(() => {
+  const events = [
+    "Instruction fetched from RAM...",
+    "CPU cycle complete.",
+    "Data write to SSD initialized.",
+    "L3 Cache hit.",
+    "Bus arbitration successful."
+  ];
+  if (Math.random() > 0.7) {
+    addLog(events[Math.floor(Math.random() * events.length)]);
+  }
+}, 3000);
+
+addLog("System initialized. Welcome to Computer Arch 3D.");
+
+// Loading Logic
+let loadProgress = 0;
+const interval = setInterval(() => {
+  loadProgress += Math.random() * 20;
+  const bar = document.getElementById('progress-bar');
+  if (bar) bar.style.width = `${Math.min(loadProgress, 100)}%`;
+  
+  if (loadProgress >= 100) {
+    clearInterval(interval);
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('tutorial-overlay').style.display = 'flex';
+    }, 500);
+  }
+}, 200);
+
+// Tutorial Logic
+document.getElementById('close-tutorial').onclick = () => {
+  document.getElementById('tutorial-overlay').style.display = 'none';
+  window.playClickSound();
+};
+
 // Handle window resize
 window.addEventListener('resize', () => {
   // Update sizes
@@ -258,11 +380,18 @@ const animate = () => {
   busCpuRam.material.emissiveIntensity = 0.5 + Math.sin(time * 10) * 0.5;
   busCpuGpu.material.emissiveIntensity = 0.5 + Math.cos(time * 8) * 0.5;
 
+  // Update particles
+  particles.forEach(p => p.update());
+
   // Update Dashboard stats with subtle variation
   if (Math.random() > 0.95) {
-    document.getElementById('cpu-temp').textContent = (40 + Math.sin(time) * 5).toFixed(1);
-    document.getElementById('ram-util').textContent = (14 + Math.cos(time * 0.5) * 0.5).toFixed(1);
-    document.getElementById('bus-speed').textContent = Math.floor(5000 + Math.random() * 50);
+    const cpuTemp = document.getElementById('cpu-temp');
+    const ramUtil = document.getElementById('ram-util');
+    const busSpeed = document.getElementById('bus-speed');
+    
+    if (cpuTemp) cpuTemp.textContent = (40 + Math.sin(time) * 5).toFixed(1);
+    if (ramUtil) ramUtil.textContent = (14 + Math.cos(time * 0.5) * 0.5).toFixed(1);
+    if (busSpeed) busSpeed.textContent = Math.floor(5000 + Math.random() * 50);
   }
 
   renderer.render(scene, camera);
