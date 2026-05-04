@@ -44,6 +44,23 @@ const popup = createPopup();
 // Simulation State
 let speedMultiplier = 1;
 
+// Web Audio API Synth for UI Sounds
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+window.playClickSound = () => {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+  gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.1);
+};
+
 // Activity Log Function
 const addLog = (message) => {
   const container = document.getElementById('log-container');
@@ -255,6 +272,28 @@ setInterval(() => {
 }, 3000);
 
 addLog("System initialized. Welcome to Computer Arch 3D.");
+
+// Loading Logic
+let loadProgress = 0;
+const interval = setInterval(() => {
+  loadProgress += Math.random() * 20;
+  const bar = document.getElementById('progress-bar');
+  if (bar) bar.style.width = `${Math.min(loadProgress, 100)}%`;
+  
+  if (loadProgress >= 100) {
+    clearInterval(interval);
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('tutorial-overlay').style.display = 'flex';
+    }, 500);
+  }
+}, 200);
+
+// Tutorial Logic
+document.getElementById('close-tutorial').onclick = () => {
+  document.getElementById('tutorial-overlay').style.display = 'none';
+  window.playClickSound();
+};
 
 // Handle window resize
 window.addEventListener('resize', () => {

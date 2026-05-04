@@ -81,8 +81,31 @@ canvas {
 
 .popup-content p {
   line-height: 1.8;
-  color: #e0e0e0;
+  color: #ffffff;
   font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.specs-list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 15px;
+}
+
+.specs-list li {
+  font-size: 13px;
+  color: #00ffcc;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.specs-list li::before {
+  content: '>';
+  margin-right: 10px;
+  opacity: 0.5;
 }
 
 #close-popup {
@@ -142,6 +165,90 @@ canvas {
   font-weight: bold;
   color: #fff;
   text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+}
+
+/* Overlays */
+#loading-screen, #tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #050505;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+}
+
+#tutorial-overlay {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: none;
+}
+
+.loader-content, .tutorial-content {
+  text-align: center;
+}
+
+.glow {
+  text-shadow: 0 0 20px rgba(0, 255, 204, 0.8);
+  letter-spacing: 4px;
+}
+
+.progress-container {
+  width: 300px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 20px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #00ffcc;
+  box-shadow: 0 0 15px #00ffcc;
+  transition: width 0.3s ease;
+}
+
+.tutorial-content {
+  background: rgba(20, 20, 25, 0.95);
+  padding: 40px;
+  border: 1px solid #00ffcc;
+  border-radius: 20px;
+  box-shadow: 0 0 50px rgba(0, 255, 204, 0.2);
+}
+
+.tutorial-content h2 {
+  color: #00ffcc;
+  margin-bottom: 30px;
+}
+
+.tutorial-content ul {
+  list-style: none;
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.tutorial-content li {
+  margin-bottom: 15px;
+  font-family: 'Inter', sans-serif;
+}
+
+#close-tutorial {
+  background: #00ffcc;
+  border: none;
+  padding: 12px 30px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#close-tutorial:hover {
+  background: #fff;
+  box-shadow: 0 0 20px #fff;
 }
 
 .control {

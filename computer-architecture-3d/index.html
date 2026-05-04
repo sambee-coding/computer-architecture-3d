@@ -8,6 +8,27 @@
     <title>Computer Architecture 3D</title>
   </head>
   <body>
+    <div id="loading-screen">
+      <div class="loader-content">
+        <div class="orbitron-text glow">SYSTEM INITIALIZING...</div>
+        <div class="progress-container">
+          <div id="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tutorial-overlay">
+      <div class="tutorial-content">
+        <h2>SYSTEM GUIDE</h2>
+        <ul>
+          <li>🖱️ <strong>Left Click</strong>: Inspect Components</li>
+          <li>🎯 <strong>Right Click + Drag</strong>: Rotate View</li>
+          <li>📜 <strong>Scroll</strong>: Zoom In/Out</li>
+        </ul>
+        <button id="close-tutorial">START SIMULATION</button>
+      </div>
+    </div>
+
     <div id="dashboard">
       <div class="stat"><span class="label">CPU TEMP:</span> <span id="cpu-temp">42</span>°C</div>
       <div class="stat"><span class="label">RAM UTIL:</span> <span id="ram-util">14.2</span> GB</div>
